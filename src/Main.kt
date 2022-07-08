@@ -1,70 +1,82 @@
-// " PSEUDO CODE "
 
 // Inisialisasi pilihan
 // Menangkap pilihan player
 // Menangkap pilihan komputer
 // Random pilihan komputer
-// Tentukan peraturan permainan
 // Tampilkan hasil
 
 
+import Main.Companion.twoPlayer
+import Main.Companion.vsBot
+
+
+
 fun main() {
-//Inisialisasi pilihan
-    val pilihan = arrayOf("gunting", "batu", "kertas")
 
-//    Membuat pilihan random untuk komputer
-    var komputer = pilihan.random()
+    var isMenu = true
 
-//    Masukkan nama player
-    println("Kenalan dulu ya... Siapa nama kamu?")
-    var namaPlayer = readLine()
-    println("Hi, $namaPlayer !! Selamat datang...")
-
-//    Menangkap pilihan player
-    println("Masukan Antara (Gunting,Batu, Kertas) ")
-    print("Input : ")
-
-    var player = readLine()
-    var status = false
-
-//    Menentukan peraturan
-    if (player!!.toLowerCase().equals(komputer.toLowerCase())) {
-        println("Seri $komputer dengan $player")
-    }
-    else if (player.toLowerCase().equals("batu")) {
-        if(komputer.toLowerCase().equals("gunting")){
-            status = true
-            hasil(status,player,komputer)
-        }else{
-            status = false
-            hasil(status,player,komputer)
+    loop@ while (isMenu){
+        Utils.getHeaderGame()
+        Utils.getMainMenu()
+        val userKeyword = readLine()?.lowercase()?.trim()?.replace("\t","")
+            ?.replace(" ","")
+        println()
+        when(userKeyword){
+            in Utils.panggil1 -> twoPlayer()
+            in Utils.panggil2 -> vsBot()
+            in Utils.panggil3 -> break@loop
+            else -> println("Pilihan hanya ada (1 - 3) ")
         }
+        isMenu = Utils.getYorN("Mau balik ke menu? (y/n)")
     }
-    else if (player.toLowerCase().equals("gunting")) {
-        if (komputer.toLowerCase().equals("kertas")) {
-            status = true
-            hasil(status,player,komputer)
-        } else {
-            status = false
-            hasil(status,player,komputer)
-        }
-    }
-    else if (player.toLowerCase().equals("kertas")) {
-        if (komputer.toLowerCase().equals("batu")) {
-            status = true
-            hasil(status,player,komputer)
-        } else {
-            status = false
-            hasil(status,player,komputer)
-        }
-    }
+    Utils.getSayGoodBye()
 }
 
-fun hasil(status: Boolean, p1: String, p2: String) {
-    if (status) {
-        println("Kamu Menang!! $p1 mengalahkan $p2")
-    } else {
-        println("Yah.. Kamu Kalah!! $p2 mengalahkan $p1")
+class Main {
 
+    companion object{
+
+        private lateinit var playerSatu : People
+        private lateinit var playerDua : People
+        private lateinit var playerComputer : Computer
+
+        private fun inputNamePlayerOne(){
+            print("\"Kenalan dulu ya... Siapa nama kamu? P1 : ")
+            var namaPlayerSatu = readLine()!!.uppercase().trim().replace(" ","")
+                .replace("\t","")
+            if (namaPlayerSatu.isBlank()){
+                namaPlayerSatu = "Anonymous_1"
+            }
+            playerSatu = People(namaPlayerSatu)
+        }
+
+        fun twoPlayer(){
+            inputNamePlayerOne()
+            print("Kalo Kamu siapa namanya? P2 : ")
+            var namaPlayerDua = readLine()!!.uppercase().trim().replace(" ","")
+                .replace("\t","")
+            if (namaPlayerDua.isBlank()){
+                namaPlayerDua = "Anonymous_2"
+            }
+            playerDua = People(namaPlayerDua)
+
+            var isKeepPlaying = true
+            while (isKeepPlaying){
+                playerSatu.attack(playerDua)
+                isKeepPlaying = Utils.getYorN("Main lagi tidak? (y/n)")
+            }
+        }
+
+        fun vsBot(){
+            inputNamePlayerOne()
+            playerComputer = Computer("Bot")
+            playerComputer.name = "Computer"
+
+            var isKeepPlaying = true
+            while (isKeepPlaying){
+                playerSatu.attack(playerComputer)
+                isKeepPlaying = Utils.getYorN("Main lagi tidak? (y/n)")
+            }
+        }
     }
 }
